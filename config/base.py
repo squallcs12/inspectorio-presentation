@@ -1,0 +1,10 @@
+import os
+
+DEBUG = False
+
+FACEBOOK_APP_ID = os.getenv('FACEBOOK_APP_ID', '1570200253098402')
+FACEBOOK_APP_SECRET = os.getenv('FACEBOOK_APP_ID', '10da16f9bc38936ae6a69eaeaf66a09c')
+
+WTF_CSRF_SECRET_KEY = os.getenv('WTF_CSRF_SECRET_KEY', 'WTF_CSRF_SECRET_KEYasd8ayshdk')
+
+SQLALCHEMY_DATABASE_URI = 'sqlite:////tmp/test.db'
