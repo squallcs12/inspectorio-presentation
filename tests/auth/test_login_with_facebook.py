@@ -21,11 +21,11 @@ class LoginWithFacebookTest(TestCase):
         app.db.drop_all(app=app)
         self.context.__exit__(None, None, None)
 
-    def test_login_with_facebook_as_new_account(self):
-        with mock.patch('auth.views.connect_view.facebook') as facebook:
+    def _test_login_with_facebook(self, status, facebook_id):
+        with mock.patch('auth.forms.facebook_connect_form.facebook') as facebook:
             facebook_api = facebook.GraphAPI.return_value
             account_info = {
-                'id': str(fake.pyint()),
+                'id': facebook_id,
                 'name': fake.name(),
             }
             facebook_api.get_object.return_value = account_info
@@ -34,13 +34,25 @@ class LoginWithFacebookTest(TestCase):
                 'code': 'example_code',
             })
 
-        assert response.status_code == httplib.OK
+        assert response.status_code == status
 
         users = User.query.all()
         assert len(users) == 1
 
         user = users[0]
         assert user.facebook_id == account_info['id']
+        return user, account_info
+
+    def test_login_with_facebook_as_new_account(self):
+        user, account_info = self._test_login_with_facebook(httplib.CREATED, str(fake.pyint()))
         assert user.name == account_info['name']
+
+    def test_login_with_facebook_as_existing_account(self):
+        user = User(facebook_id=str(fake.pyint()), name='xxx')
+        app.db.session.add(user)
+        app.db.session.commit()
+
+        user, account_info = self._test_login_with_facebook(httplib.OK, user.facebook_id)
+        assert user.name == 'xxx'
 
 

@@ -1,7 +1,6 @@
 from flask import Blueprint
 
-from auth.views.connect_view import FacebookConnectView
-from auth.views.index_view import IndexView
+from auth.views import IndexView, FacebookConnectView
 
 blueprint = Blueprint('auth', __name__, url_prefix='/auth')
 
